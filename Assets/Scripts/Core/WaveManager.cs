@@ -74,13 +74,23 @@ public class WaveManager : MonoBehaviour
 
     void SpawnOne()
     {
-        if (PlayerController.Instance == null)
+        var player = PlayerController.Instance != null
+            ? PlayerController.Instance
+            : FindFirstObjectByType<PlayerController>();
+        if (player == null)
             return;
 
         var prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-        Vector2 offset = Random.insideUnitCircle.normalized * spawnRadius;
-        Vector3 pos = PlayerController.Instance.transform.position + (Vector3)offset;
-        Instantiate(prefab, pos, Quaternion.identity);
+        if (prefab == null)
+            return;
+
+        Vector2 raw = Random.insideUnitCircle;
+        if (raw.sqrMagnitude < 0.01f)
+            raw = Vector2.right;
+        Vector2 offset = raw.normalized * spawnRadius;
+        Vector3 pos = player.transform.position + (Vector3)offset;
+        var spawned = Instantiate(prefab, pos, Quaternion.identity);
+        RuntimeVisuals.EnsureSpritesUnder(spawned);
     }
 
     void OpenRewards()

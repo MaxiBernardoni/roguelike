@@ -52,6 +52,10 @@ public class Projectile : MonoBehaviour
         rb.linearVelocity = velocityDir * speed;
         float ang = Mathf.Atan2(velocityDir.y, velocityDir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, ang);
+        var srVis = GetComponent<SpriteRenderer>();
+        RuntimeVisuals.EnsureSprite(srVis);
+        if (srVis != null && isPlayerBullet)
+            srVis.sortingOrder = Mathf.Max(srVis.sortingOrder, 8);
     }
 
     void OnTriggerEnter2D(Collider2D other)

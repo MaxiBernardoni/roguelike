@@ -14,8 +14,6 @@ public class ArenaBootstrap : MonoBehaviour
     [SerializeField] Color cameraBackground = new Color(0.08f, 0.08f, 0.11f);
     [SerializeField] float orthographicSize = 10f;
 
-    static Sprite _fallbackSprite;
-
     void Awake()
     {
         if (fixMainCamera)
@@ -66,32 +64,7 @@ public class ArenaBootstrap : MonoBehaviour
     {
         var renderers = FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None);
         foreach (var sr in renderers)
-        {
-            if (sr.sprite != null)
-                continue;
-            sr.sprite = GetFallbackSprite();
-            if (sr.color.a < 0.05f)
-                sr.color = Color.white;
-        }
-    }
-
-    static Sprite GetFallbackSprite()
-    {
-        if (_fallbackSprite != null)
-            return _fallbackSprite;
-
-        var tex = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-        Vector2 c = new Vector2(16f, 16f);
-        for (int y = 0; y < 32; y++)
-        for (int x = 0; x < 32; x++)
-        {
-            float d = Vector2.Distance(new Vector2(x, y), c);
-            tex.SetPixel(x, y, d < 14f ? Color.white : Color.clear);
-        }
-
-        tex.Apply();
-        _fallbackSprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
-        return _fallbackSprite;
+            RuntimeVisuals.EnsureSprite(sr);
     }
 
     void EnsureEventSystem()

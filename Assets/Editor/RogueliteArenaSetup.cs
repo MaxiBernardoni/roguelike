@@ -192,8 +192,8 @@ public static class RogueliteArenaSetup
         var go = new GameObject("ProjectileContent");
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = s;
-        sr.sortingOrder = 5;
-        go.transform.localScale = Vector3.one * 0.35f;
+        sr.sortingOrder = 10;
+        go.transform.localScale = Vector3.one * 0.55f;
 
         var rb = go.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
@@ -211,7 +211,7 @@ public static class RogueliteArenaSetup
         var go = new GameObject("EnemyChaserContent");
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = s;
-        sr.sortingOrder = 2;
+        sr.sortingOrder = 5;
 
         var rb = go.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
@@ -232,7 +232,7 @@ public static class RogueliteArenaSetup
         var go = new GameObject("EnemyShooterContent");
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = s;
-        sr.sortingOrder = 2;
+        sr.sortingOrder = 5;
 
         var rb = go.AddComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
