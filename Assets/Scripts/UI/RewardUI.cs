@@ -20,6 +20,12 @@ public class RewardUI : MonoBehaviour
         if (panelRoot != null)
             panelRoot.SetActive(false);
 
+        if (buttons == null)
+        {
+            Debug.LogError("RewardUI: asigna el array de Button (3 entradas).");
+            return;
+        }
+
         for (int i = 0; i < buttons.Length; i++)
         {
             int idx = i;
@@ -30,20 +36,28 @@ public class RewardUI : MonoBehaviour
 
     public void Show(int waveNumber, Upgrade[] options, System.Action<Upgrade> callback)
     {
+        if (buttons == null)
+        {
+            Debug.LogError("RewardUI.Show: faltan referencias a Button.");
+            callback?.Invoke(null);
+            return;
+        }
+
         currentOptions = options;
         onPicked = callback;
 
         if (titleText != null)
             titleText.text = "Oleada " + waveNumber + " completada — elige una mejora";
 
-        for (int i = 0; i < 3; i++)
+        int slotCount = buttons != null ? buttons.Length : 0;
+        for (int i = 0; i < slotCount; i++)
         {
             bool ok = options != null && i < options.Length;
             if (nameTexts != null && i < nameTexts.Length && nameTexts[i] != null)
                 nameTexts[i].text = ok ? options[i].Name : "—";
             if (descTexts != null && i < descTexts.Length && descTexts[i] != null)
                 descTexts[i].text = ok ? options[i].Description : "";
-            if (buttons != null && i < buttons.Length && buttons[i] != null)
+            if (buttons[i] != null)
                 buttons[i].interactable = ok;
         }
 

@@ -31,7 +31,8 @@ public class PlayerController : MonoBehaviour
     float dashEndTime;
     float nextDashTime;
 
-    public WeaponController Weapon => weapon;
+    public WeaponController Weapon =>
+        weapon != null ? weapon : (weapon = GetComponentInChildren<WeaponController>(true));
     public int MaxHealth => maxHealth;
     public int CurrentHealth { get; private set; }
     public float HealthRatio => maxHealth <= 0 ? 0f : (float)CurrentHealth / maxHealth;
@@ -48,7 +49,7 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = 0f;
         CurrentHealth = maxHealth;
         if (weapon == null)
-            weapon = GetComponentInChildren<WeaponController>();
+            weapon = GetComponentInChildren<WeaponController>(true);
     }
 
     void Update()
@@ -69,12 +70,12 @@ public class PlayerController : MonoBehaviour
             if (Time.time >= dashEndTime)
             {
                 dashing = false;
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
             }
             return;
         }
 
-        rb.velocity = moveInput.normalized * moveSpeed;
+        rb.linearVelocity = moveInput.normalized * moveSpeed;
     }
 
     void StartDash()
@@ -83,7 +84,7 @@ public class PlayerController : MonoBehaviour
         dashEndTime = Time.time + dashDuration;
         nextDashTime = Time.time + dashCooldownSeconds;
         Vector2 dir = moveInput.sqrMagnitude > 0.01f ? moveInput.normalized : lastMoveDir;
-        rb.velocity = dir * dashSpeed;
+        rb.linearVelocity = dir * dashSpeed;
     }
 
     public void TakeDamage(int amount)

@@ -34,6 +34,13 @@ public class WeaponController : MonoBehaviour
         player = GetComponentInParent<PlayerController>();
         if (firePoint == null)
             firePoint = transform;
+        if (projectilePrefab != null)
+            CombatReferences.RegisterPlayerProjectile(projectilePrefab);
+    }
+
+    void Start()
+    {
+        enemyLayer = GameLayers.GetEnemyMask(enemyLayer);
     }
 
     void Update()
@@ -83,9 +90,13 @@ public class WeaponController : MonoBehaviour
         if (nearest != null)
             return ((Vector2)nearest.transform.position - origin).normalized;
 
-        Vector3 mp = Camera.main != null
-            ? Camera.main.ScreenToWorldPoint(Input.mousePosition)
-            : origin;
+        Camera cam = Camera.main;
+        if (cam == null)
+            cam = FindFirstObjectByType<Camera>();
+        Vector3 mp = cam != null
+            ? cam.ScreenToWorldPoint(Input.mousePosition)
+            : (Vector3)origin;
+        mp.z = 0f;
         return ((Vector2)mp - origin).normalized;
     }
 

@@ -34,6 +34,10 @@ public class Projectile : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         rb.gravityScale = 0f;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        if (col != null)
+            col.isTrigger = true;
         damage = dmg;
         speed = spd;
         bouncesLeft = bounces;
@@ -42,8 +46,10 @@ public class Projectile : MonoBehaviour
         explosionRadius = expRadius;
         explosionDamage = expDmg;
         isPlayerBullet = playerBullet;
+        if (explosive)
+            enemyMask = GameLayers.GetEnemyMask(enemyMask);
         velocityDir = direction.sqrMagnitude > 0.01f ? direction.normalized : Vector2.right;
-        rb.velocity = velocityDir * speed;
+        rb.linearVelocity = velocityDir * speed;
         float ang = Mathf.Atan2(velocityDir.y, velocityDir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, ang);
     }
@@ -102,7 +108,7 @@ public class Projectile : MonoBehaviour
         if (inward.sqrMagnitude < 0.01f)
             inward = -velocityDir;
         velocityDir = Vector2.Reflect(velocityDir, inward);
-        rb.velocity = velocityDir * speed;
+        rb.linearVelocity = velocityDir * speed;
         float ang = Mathf.Atan2(velocityDir.y, velocityDir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, ang);
     }

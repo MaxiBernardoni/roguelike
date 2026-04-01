@@ -11,6 +11,12 @@ public class WaveManager : MonoBehaviour
     [SerializeField] float spawnRadius = 11f;
     [SerializeField] RewardManager rewardManager;
 
+    void Awake()
+    {
+        if (rewardManager == null)
+            rewardManager = FindFirstObjectByType<RewardManager>();
+    }
+
     int waveNumber = 1;
     float spawnTimer;
     float waveTimer;
@@ -21,6 +27,11 @@ public class WaveManager : MonoBehaviour
 
     void Start()
     {
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+            Debug.LogError("WaveManager: asigna al menos un prefab de enemigo.");
+        if (rewardManager == null)
+            Debug.LogWarning("WaveManager: sin RewardManager no habrá pantalla de mejoras (solo avanza la oleada).");
+
         BeginWave();
     }
 

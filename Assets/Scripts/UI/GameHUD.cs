@@ -11,6 +11,12 @@ public class GameHUD : MonoBehaviour
     [SerializeField] Text waveText;
     [SerializeField] WaveManager waveManager;
 
+    void Awake()
+    {
+        if (waveManager == null)
+            waveManager = FindFirstObjectByType<WaveManager>();
+    }
+
     void Update()
     {
         var p = PlayerController.Instance;

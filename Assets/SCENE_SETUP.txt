@@ -1,0 +1,64 @@
+CONFIGURACIÓN MÍNIMA DE ESCENA (MVP Unity 2D)
+============================================
+
+Capas (Edit > Project Settings > Tags and Layers)
+  - Capa "Enemy" (recomendada). Si no existe, el código usa todas las capas para apuntar/explosión.
+
+Jerarquía mínima sugerida
+
+  ArenaBootstrap          (componente ArenaBootstrap)
+  Directional Light       (opcional)
+
+  Main Camera             (ortográfica, Z acorde al plano 2D; tag MainCamera)
+
+  Systems
+    WaveManager           → arrastra RewardManager si no se autodetecta; asigna array de prefabs enemigo
+    RewardManager
+    UpgradeManager
+
+  Canvas                  (Screen Space Overlay)
+    PanelRecompensa       → RewardUI: panelRoot, titleText, 3× nameTexts, 3× descTexts, 3× Button
+    Textos HUD            → GameHUD: hpText, dashText, waveText (opcional asignar WaveManager)
+
+  Player                  (tag puede ser "Player"; no obligatorio para estos scripts)
+    PlayerController      (Rigidbody2D Dynamic, gravedad 0)
+    CircleCollider2D      (no trigger o sustituye por hijo; si collider está en hijo, el daño por contacto ya usa GetComponentInParent)
+    Weapon                (hijo, o mismo GO si WeaponController está debajo del mismo padre que Player)
+      WeaponController    → asigna Projectile prefab, firePoint; Enemy Layer opcional
+
+PREFABS
+
+  Projectile
+    - Projectile (script)
+    - Rigidbody2D Dynamic, gravedad 0
+    - Collider2D, Is Trigger = true
+    - layer: cualquiera que colisione con enemigos/jugador según matriz de física 2D
+
+  Chaser
+    - ChaserEnemy + EnemyBase vía herencia
+    - Rigidbody2D Dynamic, gravedad 0
+    - Collider2D (el script fuerza Is Trigger = true en Awake para daño por contacto)
+    - layer: Enemy
+
+  Shooter
+    - ShooterEnemy (+ EnemyBase)
+    - Rigidbody2D, Collider2D (sólido o trigger según prefieras)
+    - layer: Enemy
+    - Projectile prefab: opcional; si está vacío, usa el mismo que registra el WeaponController del jugador al Play
+
+WaveManager
+  - enemyPrefabs: al menos Chaser y Shooter
+  - rewardManager: opcional (auto FindFirstObjectByType)
+  - spawnRadius: distancia al jugador para spawn
+
+FÍSICA 2D
+  - Projectile vs Enemigo: al menos un lado con Rigidbody2D; trigger recomendado en proyectil
+  - Bala enemiga vs Player: Player con Rigidbody2D + Collider2D
+
+INPUT
+  - Input Manager clásico: ejes Horizontal / Vertical para WASD
+  - Dash: Espacio
+
+UI
+  - Unity UI (com.unity.ugui) instalado
+  - ArenaBootstrap crea EventSystem + StandaloneInputModule si faltan (clicks con timeScale = 0)

@@ -39,7 +39,7 @@ public class EnemyBase : MonoBehaviour
 
     protected void TryDamagePlayer(Collider2D other)
     {
-        var p = other.GetComponent<PlayerController>();
+        var p = other.GetComponentInParent<PlayerController>();
         if (p == null)
             return;
         if (Time.time < nextContactDamageTime)

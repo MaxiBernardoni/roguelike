@@ -23,10 +23,19 @@ public class UpgradeManager : MonoBehaviour
 
     public void Apply(Upgrade upgrade, PlayerController player)
     {
-        if (upgrade == null || player == null)
+        if (upgrade == null || player == null || upgrade.ApplyEffect == null)
             return;
 
+        try
+        {
+            upgrade.ApplyEffect.Invoke(player);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("UpgradeManager: falló al aplicar la mejora: " + ex.Message);
+            return;
+        }
+
         Acquired.Add(upgrade);
-        upgrade.ApplyEffect?.Invoke(player);
     }
 }

@@ -16,6 +16,9 @@ public class ChaserEnemy : EnemyBase
         base.Awake();
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
+        var col = GetComponent<Collider2D>();
+        if (col != null)
+            col.isTrigger = true;
     }
 
     void Start()
@@ -33,7 +36,7 @@ public class ChaserEnemy : EnemyBase
             return;
 
         Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-        rb.velocity = dir * moveSpeed;
+        rb.linearVelocity = dir * moveSpeed;
     }
 
     void OnTriggerEnter2D(Collider2D other)

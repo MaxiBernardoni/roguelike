@@ -29,6 +29,8 @@ public class ShooterEnemy : EnemyBase
         if (PlayerController.Instance != null)
             player = PlayerController.Instance.transform;
         shootTimer = shootInterval * 0.5f;
+        if (projectilePrefab == null && CombatReferences.PlayerProjectilePrefab != null)
+            projectilePrefab = CombatReferences.PlayerProjectilePrefab;
     }
 
     void Update()
@@ -60,11 +62,11 @@ public class ShooterEnemy : EnemyBase
         Vector2 dir = dist > 0.01f ? toPlayer.normalized : Vector2.right;
 
         if (dist < preferredDistance * 0.85f)
-            rb.velocity = -dir * moveSpeed;
+            rb.linearVelocity = -dir * moveSpeed;
         else if (dist > preferredDistance * 1.15f)
-            rb.velocity = dir * moveSpeed * 0.5f;
+            rb.linearVelocity = dir * moveSpeed * 0.5f;
         else
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
     }
 
     void Fire()

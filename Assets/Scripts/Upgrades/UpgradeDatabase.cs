@@ -92,7 +92,17 @@ public static class UpgradeDatabase
         int n = Mathf.Min(count, list.Count);
         var result = new Upgrade[n];
         for (int i = 0; i < n; i++)
-            result[i] = list[i];
+            result[i] = Clone(list[i]);
         return result;
+    }
+
+    static Upgrade Clone(Upgrade source)
+    {
+        return new Upgrade
+        {
+            Name = source.Name,
+            Description = source.Description,
+            ApplyEffect = source.ApplyEffect
+        };
     }
 }
