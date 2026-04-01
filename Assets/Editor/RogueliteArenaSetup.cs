@@ -262,7 +262,9 @@ public static class RogueliteArenaSetup
         cam.orthographicSize = 10f;
         cam.transform.position = new Vector3(0f, 0f, -10f);
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = new Color(0.06f, 0.06f, 0.09f);
+        cam.backgroundColor = new Color(0.08f, 0.08f, 0.11f);
+        cam.nearClipPlane = 0.1f;
+        cam.farClipPlane = 200f;
         camGo.AddComponent<AudioListener>();
     }
 

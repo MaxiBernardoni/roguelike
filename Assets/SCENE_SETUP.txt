@@ -10,6 +10,11 @@ ATAJO (recomendado)
 
 Si el menú no aparece, espera a que termine la compilación de scripts o revisa errores en la Consola.
 
+Si solo ves PANTALLA AZUL (cielo por defecto):
+  - Abre la escena Arena_MVP (o una escena que tenga el objeto ArenaBootstrap).
+  - Comprueba que la Main Camera tenga Clear Flags = Solid Color (ArenaBootstrap lo fuerza al Play si está en escena).
+  - Si pruebas otra escena vacía, crea un GameObject vacío y añade el componente ArenaBootstrap, o vuelve a ejecutar el menú Roguelite.
+
 
 
 Capas (Edit > Project Settings > Tags and Layers)
