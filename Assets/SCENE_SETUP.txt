@@ -1,6 +1,17 @@
 CONFIGURACIÓN MÍNIMA DE ESCENA (MVP Unity 2D)
 ============================================
 
+ATAJO (recomendado)
+-------------------
+1. Abre el proyecto en Unity.
+2. Barra de menú: Roguelite → Generar escena Arena (MVP).
+3. Se crean Assets/Scenes/Arena_MVP.unity, prefabs en Assets/_Generated/Prefabs/ y texturas en Assets/_Generated/.
+4. Abre Arena_MVP (doble clic) y pulsa Play.
+
+Si el menú no aparece, espera a que termine la compilación de scripts o revisa errores en la Consola.
+
+
+
 Capas (Edit > Project Settings > Tags and Layers)
   - Capa "Enemy" (recomendada). Si no existe, el código usa todas las capas para apuntar/explosión.
 
