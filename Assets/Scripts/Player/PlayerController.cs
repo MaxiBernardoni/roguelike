@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -16,6 +17,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float dashSpeed = 14f;
     [SerializeField] float dashDuration = 0.12f;
     [SerializeField] float dashCooldownSeconds = 1f;
+    [SerializeField] float dashVisualStretch = 0.28f;
+    [SerializeField] float dashVisualDuration = 0.1f;
 
     [Header("Health")]
     [SerializeField] int maxHealth = 100;
@@ -30,6 +33,10 @@ public class PlayerController : MonoBehaviour
     bool dashing;
     float dashEndTime;
     float nextDashTime;
+
+    Vector3 visualBaseScale = Vector3.one;
+    Color visualBaseColor = Color.white;
+    Coroutine dashVisualRoutine;
 
     public WeaponController Weapon =>
         weapon != null ? weapon : (weapon = GetComponentInChildren<WeaponController>(true));
@@ -51,7 +58,11 @@ public class PlayerController : MonoBehaviour
         if (weapon == null)
             weapon = GetComponentInChildren<WeaponController>(true);
 
-        CombatVisuals.ApplyPlayer(GetComponent<SpriteRenderer>());
+        var sr = GetComponent<SpriteRenderer>();
+        CombatVisuals.ApplyPlayer(sr);
+        if (sr != null)
+            visualBaseColor = sr.color;
+        visualBaseScale = transform.localScale;
     }
 
     void Update()
@@ -87,6 +98,52 @@ public class PlayerController : MonoBehaviour
         nextDashTime = Time.time + dashCooldownSeconds;
         Vector2 dir = moveInput.sqrMagnitude > 0.01f ? moveInput.normalized : lastMoveDir;
         rb.linearVelocity = dir * dashSpeed;
+
+        if (dashVisualRoutine != null)
+            StopCoroutine(dashVisualRoutine);
+        dashVisualRoutine = StartCoroutine(DashVisualRoutine(dir));
+    }
+
+    IEnumerator DashVisualRoutine(Vector2 dir)
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        Vector3 baseS = visualBaseScale;
+        Color baseC = visualBaseColor;
+        dir = dir.sqrMagnitude > 0.01f ? dir.normalized : Vector2.right;
+        float ax = Mathf.Abs(dir.x);
+        float ay = Mathf.Abs(dir.y);
+        Vector3 stretch = ax >= ay
+            ? new Vector3(1f + dashVisualStretch, 1f - dashVisualStretch * 0.55f, 1f)
+            : new Vector3(1f - dashVisualStretch * 0.55f, 1f + dashVisualStretch, 1f);
+        Vector3 targetScale = new Vector3(baseS.x * stretch.x, baseS.y * stretch.y, baseS.z);
+
+        float half = Mathf.Max(0.02f, dashVisualDuration * 0.5f);
+        float t = 0f;
+        while (t < half)
+        {
+            float k = t / half;
+            transform.localScale = Vector3.Lerp(baseS, targetScale, k);
+            if (sr != null)
+                sr.color = Color.Lerp(baseC, Color.white, k * 0.55f);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        t = 0f;
+        while (t < half)
+        {
+            float k = t / half;
+            transform.localScale = Vector3.Lerp(targetScale, baseS, k);
+            if (sr != null)
+                sr.color = Color.Lerp(Color.white, baseC, k);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = baseS;
+        if (sr != null)
+            sr.color = baseC;
+        dashVisualRoutine = null;
     }
 
     public void TakeDamage(int amount)

@@ -10,6 +10,9 @@ public class GameHUD : MonoBehaviour
     [SerializeField] Text dashText;
     [SerializeField] Text waveText;
     [SerializeField] Text ammoText;
+    [SerializeField] Color ammoNormalColor = Color.white;
+    [SerializeField] Color ammoLowColor = new Color(1f, 0.45f, 0.35f);
+    [SerializeField] Color ammoReloadColor = new Color(0.95f, 0.65f, 0.35f);
     [SerializeField] WaveManager waveManager;
 
     void Awake()
@@ -39,9 +42,17 @@ public class GameHUD : MonoBehaviour
             if (w != null)
             {
                 if (w.IsReloading)
-                    ammoText.text = "RECARGA " + w.ReloadRemaining.ToString("0.00") + " s";
+                {
+                    ammoText.text = "RELOADING...";
+                    ammoText.color = ammoReloadColor;
+                }
                 else
-                    ammoText.text = "Munición: " + w.CurrentAmmo + " / " + w.MaxAmmo;
+                {
+                    ammoText.text = "Ammo: " + w.CurrentAmmo + " / " + w.MaxAmmo;
+                    float frac = w.MaxAmmo > 0 ? (float)w.CurrentAmmo / w.MaxAmmo : 1f;
+                    bool low = frac <= 0.25f && w.CurrentAmmo > 0;
+                    ammoText.color = low ? ammoLowColor : ammoNormalColor;
+                }
             }
         }
     }

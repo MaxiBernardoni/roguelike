@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Tres botones con nombre y descripción de mejoras (estilo ROUNDS).
+/// Tres botones con mejoras, reroll una vez por oleada y cierre al elegir.
 /// </summary>
 public class RewardUI : MonoBehaviour
 {
@@ -11,9 +11,13 @@ public class RewardUI : MonoBehaviour
     [SerializeField] Text[] nameTexts;
     [SerializeField] Text[] descTexts;
     [SerializeField] Button[] buttons;
+    [SerializeField] Button rerollButton;
+    [SerializeField] Text rerollButtonLabel;
 
     Upgrade[] currentOptions;
     System.Action<Upgrade> onPicked;
+    System.Func<Upgrade[]> rerollProvider;
+    int rerollsRemaining;
 
     void Awake()
     {
@@ -32,9 +36,21 @@ public class RewardUI : MonoBehaviour
             if (buttons[i] != null)
                 buttons[i].onClick.AddListener(() => Pick(idx));
         }
+
+        if (rerollButton != null)
+            rerollButton.onClick.AddListener(OnReroll);
     }
 
     public void Show(int waveNumber, Upgrade[] options, System.Action<Upgrade> callback)
+    {
+        Show(waveNumber, options, callback, null);
+    }
+
+    public void Show(
+        int waveNumber,
+        Upgrade[] options,
+        System.Action<Upgrade> callback,
+        System.Func<Upgrade[]> rerollProvider)
     {
         if (buttons == null)
         {
@@ -45,10 +61,22 @@ public class RewardUI : MonoBehaviour
 
         currentOptions = options;
         onPicked = callback;
+        this.rerollProvider = rerollProvider;
+        rerollsRemaining = rerollProvider != null ? 1 : 0;
 
         if (titleText != null)
             titleText.text = "Oleada " + waveNumber + " completada — elige una mejora";
 
+        FillOptionSlots();
+        RefreshRerollUi();
+
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+    }
+
+    void FillOptionSlots()
+    {
+        var options = currentOptions;
         int slotCount = buttons != null ? buttons.Length : 0;
         for (int i = 0; i < slotCount; i++)
         {
@@ -60,9 +88,33 @@ public class RewardUI : MonoBehaviour
             if (buttons[i] != null)
                 buttons[i].interactable = ok;
         }
+    }
 
-        if (panelRoot != null)
-            panelRoot.SetActive(true);
+    void RefreshRerollUi()
+    {
+        if (rerollButton == null)
+            return;
+
+        bool can = rerollsRemaining > 0 && rerollProvider != null;
+        rerollButton.interactable = can;
+
+        if (rerollButtonLabel != null)
+            rerollButtonLabel.text = "Reroll (" + rerollsRemaining + ")";
+    }
+
+    void OnReroll()
+    {
+        if (rerollsRemaining <= 0 || rerollProvider == null)
+            return;
+
+        Upgrade[] next = rerollProvider.Invoke();
+        if (next == null || next.Length == 0)
+            return;
+
+        currentOptions = next;
+        rerollsRemaining = 0;
+        FillOptionSlots();
+        RefreshRerollUi();
     }
 
     void Pick(int index)
@@ -75,6 +127,7 @@ public class RewardUI : MonoBehaviour
             chosen = currentOptions[index];
 
         currentOptions = null;
+        rerollProvider = null;
         onPicked?.Invoke(chosen);
         onPicked = null;
     }

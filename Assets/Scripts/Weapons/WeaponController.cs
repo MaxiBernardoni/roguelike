@@ -10,8 +10,6 @@ public class WeaponController : MonoBehaviour
     [SerializeField] float fireRate = 4f;
     [SerializeField] int baseDamage = 12;
     [SerializeField] float projectileSpeed = 18f;
-    [SerializeField] float aimRange = 30f;
-    [SerializeField] LayerMask enemyLayer;
 
     [Header("Ammo")]
     [SerializeField] int maxAmmo = 8;
@@ -49,11 +47,6 @@ public class WeaponController : MonoBehaviour
         if (projectilePrefab != null)
             CombatReferences.RegisterPlayerProjectile(projectilePrefab);
         currentAmmo = maxAmmo;
-    }
-
-    void Start()
-    {
-        enemyLayer = GameLayers.GetEnemyMask(enemyLayer);
     }
 
     void Update()
@@ -103,7 +96,7 @@ public class WeaponController : MonoBehaviour
     void Fire()
     {
         Vector2 origin = firePoint.position;
-        Vector2 dir = GetAimDirection(origin);
+        Vector2 dir = GetMouseAimDirection(origin);
         int count = 1 + extraProjectiles;
         float spread = count > 1 ? 18f : 0f;
 
@@ -115,24 +108,9 @@ public class WeaponController : MonoBehaviour
         }
     }
 
-    Vector2 GetAimDirection(Vector2 origin)
+    /// <summary>Dirección desde <paramref name="origin"/> hacia el cursor en mundo (sin auto-apuntado).</summary>
+    static Vector2 GetMouseAimDirection(Vector2 origin)
     {
-        Collider2D nearest = null;
-        float best = aimRange * aimRange;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, aimRange, enemyLayer);
-        foreach (var h in hits)
-        {
-            float d = ((Vector2)h.transform.position - origin).sqrMagnitude;
-            if (d < best)
-            {
-                best = d;
-                nearest = h;
-            }
-        }
-
-        if (nearest != null)
-            return ((Vector2)nearest.transform.position - origin).normalized;
-
         Camera cam = Camera.main;
         if (cam == null)
             cam = FindFirstObjectByType<Camera>();
@@ -140,7 +118,10 @@ public class WeaponController : MonoBehaviour
             ? cam.ScreenToWorldPoint(Input.mousePosition)
             : (Vector3)origin;
         mp.z = 0f;
-        return ((Vector2)mp - origin).normalized;
+        Vector2 d = (Vector2)mp - origin;
+        if (d.sqrMagnitude < 0.0001f)
+            return Vector2.right;
+        return d.normalized;
     }
 
     void SpawnProjectileFrom(Vector2 origin, Vector2 dir)
@@ -166,7 +147,7 @@ public class WeaponController : MonoBehaviour
     {
         if (!spawnOnKill)
             return;
-        Vector2 d = GetAimDirection(deathPos);
+        Vector2 d = GetMouseAimDirection(deathPos);
         SpawnProjectileFrom(deathPos, d);
     }
 

@@ -420,6 +420,24 @@ public static class RogueliteArenaSetup
             btnLabel.alignment = TextAnchor.MiddleCenter;
         }
 
+        var rerollGo = new GameObject("RerollButton");
+        rerollGo.transform.SetParent(panel.transform, false);
+        var rerollRt = rerollGo.AddComponent<RectTransform>();
+        rerollRt.anchorMin = new Vector2(0.5f, 1f);
+        rerollRt.anchorMax = new Vector2(0.5f, 1f);
+        rerollRt.pivot = new Vector2(0.5f, 1f);
+        rerollRt.sizeDelta = new Vector2(240, 46);
+        rerollRt.anchoredPosition = new Vector2(0f, -600f);
+        var rerollImg = rerollGo.AddComponent<Image>();
+        rerollImg.color = new Color(0.22f, 0.22f, 0.32f, 1f);
+        var rerollBtn = rerollGo.AddComponent<Button>();
+        var rerollColors = rerollBtn.colors;
+        rerollColors.highlightedColor = new Color(0.35f, 0.35f, 0.5f);
+        rerollBtn.colors = rerollColors;
+        Text rerollLabel = CreateUiText(rerollGo.transform, "RerollLabel", "Reroll (1)", font, 17, TextAnchor.MiddleCenter,
+            new Vector2(0.5f, 0.5f), new Vector2(220, 44), Vector2.zero);
+        rerollLabel.alignment = TextAnchor.MiddleCenter;
+
         var rewardUi = canvasGo.AddComponent<RewardUI>();
         SerializedObject soR = new SerializedObject(rewardUi);
         soR.FindProperty("panelRoot").objectReferenceValue = panel;
@@ -433,6 +451,9 @@ public static class RogueliteArenaSetup
             soR.FindProperty("descTexts").GetArrayElementAtIndex(i).objectReferenceValue = descTexts[i];
             soR.FindProperty("buttons").GetArrayElementAtIndex(i).objectReferenceValue = buttons[i];
         }
+
+        soR.FindProperty("rerollButton").objectReferenceValue = rerollBtn;
+        soR.FindProperty("rerollButtonLabel").objectReferenceValue = rerollLabel;
 
         soR.ApplyModifiedPropertiesWithoutUndo();
     }

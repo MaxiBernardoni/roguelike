@@ -24,13 +24,17 @@ public class RewardManager : MonoBehaviour
 
         Time.timeScale = 0f;
         Upgrade[] options = UpgradeDatabase.PickRandom(3);
-        rewardUi.Show(waveNumber, options, upgrade =>
-        {
-            if (UpgradeManager.Instance != null && PlayerController.Instance != null && upgrade != null)
-                UpgradeManager.Instance.Apply(upgrade, PlayerController.Instance);
+        rewardUi.Show(
+            waveNumber,
+            options,
+            upgrade =>
+            {
+                if (UpgradeManager.Instance != null && PlayerController.Instance != null && upgrade != null)
+                    UpgradeManager.Instance.Apply(upgrade, PlayerController.Instance);
 
-            Time.timeScale = 1f;
-            onClosed?.Invoke();
-        });
+                Time.timeScale = 1f;
+                onClosed?.Invoke();
+            },
+            () => UpgradeDatabase.PickRandom(3));
     }
 }
