@@ -21,10 +21,6 @@ public class EnemyBase : MonoBehaviour
     {
         currentHealth = maxHealth;
         AliveCount++;
-        var sr = GetComponent<SpriteRenderer>();
-        RuntimeVisuals.EnsureSprite(sr);
-        if (sr != null)
-            sr.sortingOrder = Mathf.Max(sr.sortingOrder, 5);
     }
 
     public virtual void TakeDamage(int amount)

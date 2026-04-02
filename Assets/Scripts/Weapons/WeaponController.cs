@@ -1,22 +1,29 @@
 using UnityEngine;
 
 /// <summary>
-/// Disparo automático hacia el enemigo más cercano o hacia el cursor.
-/// Las mejoras modifican cadencia, multidisparo, rebotes, explosiones y callbacks de muerte.
+/// Disparo manual (ratón izquierdo), cadencia, munición y recarga. Mejoras: multidisparo, rebotes, explosiones, etc.
 /// </summary>
 public class WeaponController : MonoBehaviour
 {
     [SerializeField] Projectile projectilePrefab;
     [SerializeField] Transform firePoint;
-    [SerializeField] float fireRate = 3f;
+    [SerializeField] float fireRate = 4f;
     [SerializeField] int baseDamage = 12;
     [SerializeField] float projectileSpeed = 18f;
     [SerializeField] float aimRange = 30f;
     [SerializeField] LayerMask enemyLayer;
 
+    [Header("Ammo")]
+    [SerializeField] int maxAmmo = 8;
+    [SerializeField] float reloadTime = 1.15f;
+
     PlayerController player;
 
-    float fireTimer;
+    int currentAmmo;
+    bool isReloading;
+    float reloadEndTime;
+    float nextFireTime;
+
     int extraProjectiles;
     int projectileBounces;
     int pierceExtraHits;
@@ -28,6 +35,11 @@ public class WeaponController : MonoBehaviour
     float lowHpDamageMultiplier = 1f;
 
     public int BaseDamage => baseDamage;
+    public int CurrentAmmo => currentAmmo;
+    public int MaxAmmo => maxAmmo;
+    public bool IsReloading => isReloading;
+    public float ReloadTime => reloadTime;
+    public float ReloadRemaining => isReloading ? Mathf.Max(0f, reloadEndTime - Time.time) : 0f;
 
     void Awake()
     {
@@ -36,6 +48,7 @@ public class WeaponController : MonoBehaviour
             firePoint = transform;
         if (projectilePrefab != null)
             CombatReferences.RegisterPlayerProjectile(projectilePrefab);
+        currentAmmo = maxAmmo;
     }
 
     void Start()
@@ -48,13 +61,43 @@ public class WeaponController : MonoBehaviour
         if (player == null || !player.gameObject.activeSelf)
             return;
 
-        fireTimer += Time.deltaTime;
-        float interval = 1f / fireRate;
-        while (fireTimer >= interval)
+        if (isReloading)
         {
-            fireTimer -= interval;
-            Fire();
+            if (Time.time >= reloadEndTime)
+            {
+                isReloading = false;
+                currentAmmo = maxAmmo;
+            }
+
+            return;
         }
+
+        if (!Input.GetMouseButton(0))
+            return;
+
+        if (Time.time < nextFireTime)
+            return;
+
+        if (currentAmmo <= 0)
+        {
+            StartReload();
+            return;
+        }
+
+        Fire();
+        currentAmmo--;
+        nextFireTime = Time.time + 1f / fireRate;
+
+        if (currentAmmo <= 0)
+            StartReload();
+    }
+
+    void StartReload()
+    {
+        if (isReloading)
+            return;
+        isReloading = true;
+        reloadEndTime = Time.time + reloadTime;
     }
 
     void Fire()
@@ -141,8 +184,6 @@ public class WeaponController : MonoBehaviour
         float c = Mathf.Cos(rad), s = Mathf.Sin(rad);
         return new Vector2(v.x * c - v.y * s, v.x * s + v.y * c);
     }
-
-    // --- Mejoras (llamadas desde Upgrade.ApplyEffect vía PlayerController) ---
 
     public void AddFireRateMultiplier(float mult)
     {

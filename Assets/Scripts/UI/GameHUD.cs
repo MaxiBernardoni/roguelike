@@ -9,6 +9,7 @@ public class GameHUD : MonoBehaviour
     [SerializeField] Text hpText;
     [SerializeField] Text dashText;
     [SerializeField] Text waveText;
+    [SerializeField] Text ammoText;
     [SerializeField] WaveManager waveManager;
 
     void Awake()
@@ -31,5 +32,17 @@ public class GameHUD : MonoBehaviour
 
         if (waveManager != null && waveText != null)
             waveText.text = "Oleada: " + waveManager.WaveNumber;
+
+        if (p != null && ammoText != null)
+        {
+            var w = p.Weapon;
+            if (w != null)
+            {
+                if (w.IsReloading)
+                    ammoText.text = "RECARGA " + w.ReloadRemaining.ToString("0.00") + " s";
+                else
+                    ammoText.text = "Munición: " + w.CurrentAmmo + " / " + w.MaxAmmo;
+            }
+        }
     }
 }

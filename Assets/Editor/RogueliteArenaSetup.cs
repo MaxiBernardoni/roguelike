@@ -338,12 +338,15 @@ public static class RogueliteArenaSetup
             new Vector2(0, 1), new Vector2(320, 40), new Vector2(20, -50));
         Text wave = CreateUiText(canvasGo.transform, "WaveText", "Oleada: —", font, 18, TextAnchor.UpperLeft,
             new Vector2(0, 1), new Vector2(320, 40), new Vector2(20, -80));
+        Text ammo = CreateUiText(canvasGo.transform, "AmmoText", "Munición: —", font, 18, TextAnchor.UpperLeft,
+            new Vector2(0, 1), new Vector2(360, 40), new Vector2(20, -110));
 
         var hud = canvasGo.AddComponent<GameHUD>();
         SerializedObject soHud = new SerializedObject(hud);
         soHud.FindProperty("hpText").objectReferenceValue = hp;
         soHud.FindProperty("dashText").objectReferenceValue = dash;
         soHud.FindProperty("waveText").objectReferenceValue = wave;
+        soHud.FindProperty("ammoText").objectReferenceValue = ammo;
         soHud.FindProperty("waveManager").objectReferenceValue = waveManager;
         soHud.ApplyModifiedPropertiesWithoutUndo();
 

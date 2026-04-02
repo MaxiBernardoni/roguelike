@@ -22,6 +22,7 @@ public class ShooterEnemy : EnemyBase
         base.Awake();
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
+        CombatVisuals.ApplyShooter(GetComponent<SpriteRenderer>());
     }
 
     void Start()

@@ -19,6 +19,7 @@ public class ChaserEnemy : EnemyBase
         var col = GetComponent<Collider2D>();
         if (col != null)
             col.isTrigger = true;
+        CombatVisuals.ApplyChaser(GetComponent<SpriteRenderer>());
     }
 
     void Start()

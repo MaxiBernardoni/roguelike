@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
         CurrentHealth = maxHealth;
         if (weapon == null)
             weapon = GetComponentInChildren<WeaponController>(true);
+
+        CombatVisuals.ApplyPlayer(GetComponent<SpriteRenderer>());
     }
 
     void Update()
