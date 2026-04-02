@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 6f;
+    [SerializeField] float screenBoundsMargin = 0.5f;
 
     [Header("Dash")]
     [SerializeField] float dashSpeed = 14f;
@@ -85,10 +86,13 @@ public class PlayerController : MonoBehaviour
                 dashing = false;
                 rb.linearVelocity = Vector2.zero;
             }
-            return;
+        }
+        else
+        {
+            rb.linearVelocity = moveInput.normalized * moveSpeed;
         }
 
-        rb.linearVelocity = moveInput.normalized * moveSpeed;
+        ScreenBounds.ClampRigidbody(rb, screenBoundsMargin);
     }
 
     void StartDash()

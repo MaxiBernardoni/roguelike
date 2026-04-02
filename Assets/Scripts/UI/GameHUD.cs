@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Muestra vida, enfriamiento del dash y número de oleada.
+/// Muestra vida, dash, oleada y munición (siempre que haya Texto de ammo, resolviendo referencia si falta).
 /// </summary>
 public class GameHUD : MonoBehaviour
 {
@@ -19,9 +19,28 @@ public class GameHUD : MonoBehaviour
     {
         if (waveManager == null)
             waveManager = FindFirstObjectByType<WaveManager>();
+
+        if (ammoText == null)
+        {
+            foreach (var t in GetComponentsInChildren<Text>(true))
+            {
+                if (t.gameObject.name.IndexOf("Ammo", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    ammoText = t;
+                    break;
+                }
+            }
+        }
+
+        if (ammoText == null)
+        {
+            var found = GameObject.Find("AmmoText");
+            if (found != null)
+                ammoText = found.GetComponent<Text>();
+        }
     }
 
-    void Update()
+    void LateUpdate()
     {
         var p = PlayerController.Instance;
         if (p != null && hpText != null)
@@ -36,24 +55,38 @@ public class GameHUD : MonoBehaviour
         if (waveManager != null && waveText != null)
             waveText.text = "Oleada: " + waveManager.WaveNumber;
 
-        if (p != null && ammoText != null)
+        if (ammoText == null)
+            return;
+
+        WeaponController w = null;
+        if (p != null)
+            w = p.Weapon;
+
+        if (w == null)
         {
-            var w = p.Weapon;
-            if (w != null)
+            w = FindFirstObjectByType<WeaponController>();
+        }
+
+        if (w != null)
+        {
+            if (w.IsReloading)
             {
-                if (w.IsReloading)
-                {
-                    ammoText.text = "RELOADING...";
-                    ammoText.color = ammoReloadColor;
-                }
-                else
-                {
-                    ammoText.text = "Ammo: " + w.CurrentAmmo + " / " + w.MaxAmmo;
-                    float frac = w.MaxAmmo > 0 ? (float)w.CurrentAmmo / w.MaxAmmo : 1f;
-                    bool low = frac <= 0.25f && w.CurrentAmmo > 0;
-                    ammoText.color = low ? ammoLowColor : ammoNormalColor;
-                }
+                ammoText.text = "RELOADING...";
+                ammoText.color = ammoReloadColor;
             }
+            else
+            {
+                ammoText.enabled = true;
+                ammoText.text = "Ammo: " + w.CurrentAmmo + " / " + w.MaxAmmo;
+                float frac = w.MaxAmmo > 0 ? (float)w.CurrentAmmo / w.MaxAmmo : 1f;
+                bool low = w.MaxAmmo > 0 && frac <= 0.25f;
+                ammoText.color = low ? ammoLowColor : ammoNormalColor;
+            }
+        }
+        else
+        {
+            ammoText.text = "Ammo: — / —";
+            ammoText.color = ammoNormalColor;
         }
     }
 }

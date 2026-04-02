@@ -7,6 +7,7 @@ using UnityEngine;
 public class ChaserEnemy : EnemyBase
 {
     [SerializeField] float moveSpeed = 3.2f;
+    [SerializeField] float screenBoundsMargin = 0.45f;
 
     Transform player;
     Rigidbody2D rb;
@@ -38,6 +39,7 @@ public class ChaserEnemy : EnemyBase
 
         Vector2 dir = ((Vector2)player.position - rb.position).normalized;
         rb.linearVelocity = dir * moveSpeed;
+        ScreenBounds.ClampRigidbody(rb, screenBoundsMargin);
     }
 
     void OnTriggerEnter2D(Collider2D other)

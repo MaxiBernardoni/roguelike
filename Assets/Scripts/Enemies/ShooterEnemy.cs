@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class ShooterEnemy : EnemyBase
 {
+    [SerializeField] float screenBoundsMargin = 0.45f;
     [SerializeField] Projectile projectilePrefab;
     [SerializeField] float preferredDistance = 5f;
     [SerializeField] float moveSpeed = 2.5f;
@@ -68,6 +69,8 @@ public class ShooterEnemy : EnemyBase
             rb.linearVelocity = dir * moveSpeed * 0.5f;
         else
             rb.linearVelocity = Vector2.zero;
+
+        ScreenBounds.ClampRigidbody(rb, screenBoundsMargin);
     }
 
     void Fire()
